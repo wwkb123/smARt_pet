@@ -1,65 +1,35 @@
-# Placing Virtual Objects in Augmented Reality
-
-Follow best practices for visual feedback, gesture interactions, and realistic rendering in AR experiences.
-
-## Overview
-
-Augmented reality (AR) offers new ways for users to interact with real and virtual 3D content in your app. However, many fundamental principles of human interface design are still valid. Convincing AR illusions also require careful attention to 3D asset design and rendering. By following this article's guidelines for AR human interface principles and experimenting with this sample code, you can create immersive, intuitive AR experiences.
-
-## Getting Started
-
-ARKit and this sample app require iOS 11 and a device with an A9 (or later) processor. (ARKit is not available in iOS Simulator.)
-
-## Provide Clear Feedback
-
-**Help users recognize when your app is ready for real-world interactions.**
-Tracking the real-world environment involves complex algorithms whose timeliness and accuracy are affected by real-world conditions.
-
-The [`FocusSquare`](x-source-tag://FocusSquare) class draws a square outline in the AR view, giving the user hints about the status of ARKit world tracking. The square changes size to reflect estimated scene depth, and switches between open and closed states with a prominent animation to indicate whether ARKit has detected a plane suitable for placing an object.
-
-Use the [`session(_:cameraDidChangeTrackingState:)`](https://developer.apple.com/documentation/arkit/arsessionobserver/2887450-session) delegate method to detect changes in tracking quality, and present feedback to the user when low-quality conditions are correctable (for example, by telling the user to move to an environment with better lighting).
-
-Use specific terms a user is likely to recognize. For example, if you give textual feedback for plane detection, a user not familiar with technical definitions might mistake the word "plane" as referring to aircraft.
-
-Fall back gracefully if tracking fails, and allow the user to reset tracking if their experience isn't working as expected. In this sample's `ViewController` class, see the [`session(_:cameraDidChangeTrackingState:)`](https://developer.apple.com/documentation/arkit/arsessionobserver/2887450-session) for a way to temporarily use lower-fidelity tracking, and the [`restartExperience`](x-source-tag://restartExperience) button and method for resetting tracking.
-
-**Help users understand the relationship of your app's virtual content to the real world.** Use visual cues in your UI that react to changes in camera position relative to virtual content.
-
-In this sample, the focus square disappears after the user places an object in the scene, and reappears when the user points the camera away from the object.
-
-## Enable Direct Manipulation
-
-**Provide common gestures, familiar to users of other iOS apps, for interacting with real-world objects.** See the [`Gesture`](x-source-tag://Gesture) class for implementations of the gestures available in this sample app, such as one-finger dragging to move a virtual object and two-finger rotation to spin the object.
-
-Map touch gestures into a restricted space so the user can more easily control results. Touch gestures are inherently two-dimensional, but an AR experience involves the three dimensions of the real world. For example:
-
-- Limit object dragging to the two-dimensional plane the object rests on. (Especially if a plane represents the ground or floor, it often makes sense to ignore the plane's extent while dragging.)
-
-- Limit object rotation to a single axis at a time. (In this sample, each object rests on a plane, so the object can rotate around a vertical axis.)
-
-- Don't allow the user to resize virtual objects, or offer this ability only sparingly. A virtual object inhabits the real world more convincingly when it has an intuitive intrinsic size. Additionally, a user may become confused as to whether they're resizing an object or changing its depth relative to the camera. (If you do provide object resizing, use pinch gestures.)
-
-While the user is dragging a virtual object, smooth the changes in its position so that it doesn't appear to jump while moving. See the `updateVirtualObjectPosition` method for an example of smoothing based on perceived distance from the camera.
-
-Set thresholds for gestures so that the user doesn't trigger a gesture accidentally, but moderate your thresholds so that gestures aren't too hard to discover or intentionally trigger. See the [`TwoFingerGesture`](x-source-tag://TwoFingerGesture) class for examples of using thresholds to dynamically choose gesture effects.
-
-Provide an area that's large enough for the user to tap (or begin to drag) a virtual object and still see the object while moving it. For examples, see how the [`TwoFingerGesture`](x-source-tag://TwoFingerGesture) class calculates its  `firstTouchWasOnObject` property.
-
-**Design interactions for situations where AR illusions can be most convincing.** For example, place virtual content near the centers of detected planes, where it's safer to assume that the detected plane is a good match to the real-world surface. It may be tempting to design experiences that use the full surface of a tabletop, where virtual scene elements can react to or fall off the table's edges. However, world tracking and plane detection may not precisely estimate the edges of the table.
-
-
-## Keep the User in Control
-
-**Strive for a balance between accurately placing virtual content and respecting the user's input.** For example, consider a situation where the user attempts to place content that should appear on top of a flat surface.
-
-- Try to place content by using the [`hitTest(_:types:)`](https://developer.apple.com/documentation/arkit/arframe/2875718-hittest) method to search for an intersection with a plane anchor. If you don't find a plane anchor, there might still be a plane at the target location that has not yet been identified by plane detection.
-- Lacking a plane anchor, you can hit-test against scene features to get a rough estimate for where to place content initially, and refine that estimate over time as ARKit detects planes.
-- When plane detection provides a better estimate for where to place content, use animation to subtly move that content to its new position. Having user-placed content suddenly jump to a new position can break the AR illusion and confuse the user.
-- Filter out hit test results that are too close or too far away. In most scenarios, there's a reasonable limit to how far away virtual content can be placed. To prevent users from accidentally placing virtual content too far away, you can use the `distance` property of `ARHitTestResult` to filter out hit tests that exeed the limit.
-
-**Avoid interrupting the AR experience.** If the user transitions to another full-screen UI in your app, the AR view might not be in an expected state when they return.
-
-To keep the user in the AR experience while adjusting settings or making a modal selection, use the popover presentation (even on iPhone) for auxiliary view controllers. In this sample, the `SettingsViewController` and `VirtualObjectSelectionViewController` classes use popover presentation.
-
-
 # smARt_pet
+
+# Inspiration
+New York City is a fast-paced city where the living pressure ranks the second in America. Due to the increased depression and hidden mental disease among people, our group is inspired to create a virtual pet to interact with user, to recognize the user’s emotion and save it for future analysis to detect hidden mental disease.
+
+# What it does
+smARt Pet is a healthcare based app that built on IBM Watson’s techniques to prevent depression. The pet can communicate with users and give response based on users’ emotions. The conversation will be recognized by IBM Watson's Speech-to-Text API and be analyzed using IBM Watson's Tone Analyzer. Depending on the result, the pet would give various responses, for example, playing upbeat music through music player when the user is upset, or looking for online specialists to help them to deal with the emotions. In addition to that, the pet can also remind/alert the user about events such as exams, meetings, or real time train traffic, to try to prevent the situation that they forget something/being late which make them stressful. This app can be connected to healthcare database such as TalkSpace to predict the possibility of the user is potentially having depression.
+
+# How we built it
+We use Apple's ARKit to detect the plane field as a location to place our virtual pet. The pet can interact using voice recognition techniques of IBM Watson's Speech-to-Text API to get user's speech, and parse it into text that would be analyzed later using IBM Watson's tone analyzer API to recognize the user's emotion based on their speech. Based on the user's data, our virtual pets would suggest several choices such as, if the user is sad, then our pet would give suggestion to play some upbeat music or if the user is feeling stressed, we play some calm music, or suggest the user to call a close friend.
+
+# Challenges we ran into:
+Utilizing the ARKit to detect the plane area and positioned the pet to have perfect size. Importing the pet's 3D model from Blender into the Xcode because when we tried to import the whole animation, the Xcode wouldn't register the texture into the model and leaving our pet's transparent. Utilizing the IBM Watson's API into our code since the documentation of the swift SDK is not very well documented(older version)
+
+# Accomplishment that we're proud of
+We are able to finish our first AR program. Before this, we had no idea how to implement nor create stuff about AR/IBM Watson. We are really proud of that we can finish the majority features on time that we emphasized on helping people reducing depression caused by stress and detecting hidden mental disease.
+
+# What we learn
+Learned so much about technical stuffs (ARKit, IBM Watson, Blender) and non-technical stuffs (work management, on-time, commitment to the coding) along the way of development. We found that teamwork is very important.
+
+# What's next for smARt Pet
+Computer Vision System
+
+Better recognition of user's emotion based on the user's face.
+
+More accurate and precise recognition of environment area, so the pets can moved around exactly like that pet was there.
+
+Adding animations that would respond to many situations
+
+Getting user's data and emotion in daily basis and give it to the user's personal doctor, and later the doctor can use that to diagnose the user's mental state and condition.
+
+Matching the data of TalkSpace, a psychological clinical working with IBM, we can detect hidden mental disease.
+
+Implementing this kind of technology on platform such as Google Glass, to let user have more interaction with the pet, e.g. seeing the pet running around the user, or doing exercise together(running on the street with you) to reduce stress
+
