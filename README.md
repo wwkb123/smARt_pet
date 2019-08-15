@@ -1,5 +1,7 @@
 # smARt_pet
 
+Link: https://devpost.com/software/smart-pet
+
 # Inspiration
 New York City is a fast-paced city where the living pressure ranks the second in America. Due to the increased depression and hidden mental disease among people, our group is inspired to create a virtual pet to interact with user, to recognize the user’s emotion and save it for future analysis to detect hidden mental disease.
 
